@@ -1,0 +1,41 @@
+{% extends "app/layout.html" %}
+
+{% block body %}
+
+<h1>TODO</h1>
+<ul>
+    <li>create version/log to track daily progress
+        <ul>
+            <li>date, version (corresponds with .git version), change description</li>
+        </ul>
+    </li>
+    <li>determine how to aggregate data from CDC
+        <ul>
+            <li>start with manual download of .csv</li>
+            <li>automate via Python</li>
+        </ul>
+    </li>
+    <li>determine how to store data
+        <ul>
+            <li>master .csv file? Can then use numpy, pandas df</li>
+            <li>sqlite db - possible</li>
+            <li>any way to use MySQL?</li>
+        </ul>
+    </li>
+    <li>create raw data presntation webpage
+        <ul>
+            <li>should demonstrate retrieval of stored data in raw format</li>
+            <li>Django database model objects?</li>
+        </ul>
+    </li>
+    <li>create specific pages for data interpretation
+        <ul>
+            <li>separate by state?</li>
+            <li>separate by time period?</li>
+            <li>creation of data visuals?</li>
+        </ul>
+    </li>
+</ul>
+
+{% endblock %}
+    
