@@ -2,6 +2,33 @@
 
 {% block body %}
 
-<h1>Log</h1>
+<h1>Logs</h1>
+<h4>Create Log</h4>
+
+<form class="createLog" action="{% url 'log' %}" method="post">
+    {% csrf_token %}
+    <table class="logs">
+        {{ form.as_table }}
+        <td>
+            <input type="submit" value="Log">
+        </td>
+    </table>
+</form>
+
+<h4>Log History</h4>
+<table>
+    <tr>
+        <th>Version</th>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+{% for log in logs %}
+    <tr>
+        <td>{{ log.version }}</td>
+        <td>{{ log.date }}</td>
+        <td>{{ log.desc }}</td>
+    </tr>
+{% endfor %}
+</table>
 
 {% endblock %}
