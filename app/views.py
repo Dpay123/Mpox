@@ -1,38 +1,41 @@
 from sqlite3 import IntegrityError
+from tkinter.tix import INTEGER
 from django.shortcuts import render, redirect
-from django.forms import ModelForm
-import csv
+from django.db.models import Sum
 from datetime import datetime
 
-from .models import *
 from . import convert
-
-class LogEntryForm(ModelForm):
-    class Meta:
-        model = LogEntry
-        fields = ['version', 'desc']
-
-class TaskEntryForm(ModelForm):
-    class Meta:
-        model = Task
-        fields = ['priority', 'desc']    
+from .forms import *
 
 def index(request):
-    # get raw data conversion from .csv
-    data = convert.convert()
-    # store into db
-    CaseEntry.objects.bulk_create([CaseEntry(**{
-        'country': d['country'],
-        'numCases': d['cases'],
-        'numDeaths': d['deaths'],
-        'endemic': d['endemic'],
-        'date': d['date']
-    }) for d in data], ignore_conflicts=True)
-    cases = CaseEntry.objects.all()
-    context = {
-        'cases': cases
-    }
-    return render(request, "app/index.html", context)
+    message = 'Select Filter'
+    if request.method == 'GET':
+        context = {
+            'message': message,
+            'form': Filter()
+        }
+        return render(request, "app/index.html", context)
+    else:
+        # dateInput variable stores format 'yyyy-mm-dd'
+        dateInput = request.POST['date']
+        countryInput = request.POST['country']
+        if countryInput:
+            cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
+            totalC = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numCases'))
+            totalD = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numDeaths'))
+        else:
+            cases = CaseEntry.objects.filter(date=dateInput)
+            totalC = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numCases'))
+            totalD = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numDeaths'))
+        context = {
+            'message': message,
+            'cases': cases,
+            'form': Filter(request.POST),
+            'totalC': totalC['numCases__sum'],
+            'totalD': totalD['numDeaths__sum']
+        }
+        return render(request, "app/index.html", context)
+
 
 def todo(request):
     if request.method == 'GET':
