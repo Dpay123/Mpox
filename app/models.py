@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 
 # Create your models here.
@@ -16,3 +17,13 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.priority} | {self.desc}"
+
+class CaseEntry(models.Model):
+    class Meta:
+        unique_together = (('country', 'date'),)
+
+    country = models.CharField(max_length=50, primary_key=True)
+    numCases = models.IntegerField()
+    numDeaths = models.IntegerField()
+    endemic = models.BooleanField()
+    date = models.DateField()
