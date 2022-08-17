@@ -8,26 +8,29 @@ from . import convert
 from .forms import *
 
 def index(request):
+    message = 'Select Filter'
     if request.method == 'GET':
-        cases = CaseEntry.objects.all()
-        totalC = CaseEntry.objects.all().aggregate(Sum('numCases'))
-        totalD = CaseEntry.objects.all().aggregate(Sum('numDeaths'))
         context = {
-            'cases': cases,
-            'form': DateFilter(),
-            'totalC': totalC['numCases__sum'],
-            'totalD': totalD['numDeaths__sum']
+            'message': message,
+            'form': Filter()
         }
         return render(request, "app/index.html", context)
     else:
         # dateInput variable stores format 'yyyy-mm-dd'
         dateInput = request.POST['date']
-        cases = CaseEntry.objects.filter(date=dateInput)
-        totalC = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numCases'))
-        totalD = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numDeaths'))
+        countryInput = request.POST['country']
+        if countryInput:
+            cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
+            totalC = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numCases'))
+            totalD = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numDeaths'))
+        else:
+            cases = CaseEntry.objects.filter(date=dateInput)
+            totalC = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numCases'))
+            totalD = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numDeaths'))
         context = {
+            'message': message,
             'cases': cases,
-            'form': DateFilter(request.POST),
+            'form': Filter(request.POST),
             'totalC': totalC['numCases__sum'],
             'totalD': totalD['numDeaths__sum']
         }

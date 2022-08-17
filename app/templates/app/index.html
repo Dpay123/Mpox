@@ -2,12 +2,15 @@
 
 {% block body %}
 
-<h1>Case Data</h1>
+<h1>{{message}}</h1>
 <form action="{% url 'index' %}" method="post" name="getDate">
     {% csrf_token %}
-    {{ form }}
+    {{ form.date }}
+    {{ form.country }}
     <input type="submit" value="Filter">
 </form>
+
+{% if cases %}
 <h2>Total Cases: {{ totalC }}</h2>
 <h2>Total Deaths: {{ totalD }}</h2>
 <table>
@@ -24,5 +27,8 @@
     </tr>
     {% endfor %}
 </table>
+{% else %}
+<h2>No case data found for this date</h2>
+{% endif %}
 
 {% endblock %}
