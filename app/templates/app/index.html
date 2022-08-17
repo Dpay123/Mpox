@@ -2,6 +2,24 @@
 
 {% block body %}
 
-<h1>Home Page</h1>
+<h1>Case Data</h1>
+<table>
+    <tr>
+        <th>Country</th>
+        <th># Cases</th>
+        <th># Deaths</th>
+        <th>Endemic?</th>
+        <th>Date Reported</th>
+    </tr>
+    {% for case in cases %}
+    <tr>
+        <td>{{case.country}}</td>
+        <td>{{case.numCases}}</td>
+        <td>{{case.numDeaths}}</td>
+        <td>{{case.endemic}}</td>
+        <td>{{case.date}}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}

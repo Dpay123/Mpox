@@ -1,7 +1,11 @@
+from sqlite3 import IntegrityError
 from django.shortcuts import render, redirect
 from django.forms import ModelForm
+import csv
+from datetime import datetime
 
 from .models import *
+from . import convert
 
 class LogEntryForm(ModelForm):
     class Meta:
@@ -11,11 +15,24 @@ class LogEntryForm(ModelForm):
 class TaskEntryForm(ModelForm):
     class Meta:
         model = Task
-        fields = ['priority', 'desc']
+        fields = ['priority', 'desc']    
 
-# Create your views here.
 def index(request):
-    return render(request, "app/index.html")
+    # get raw data conversion from .csv
+    data = convert.convert()
+    # store into db
+    CaseEntry.objects.bulk_create([CaseEntry(**{
+        'country': d['country'],
+        'numCases': d['cases'],
+        'numDeaths': d['deaths'],
+        'endemic': d['endemic'],
+        'date': d['date']
+    }) for d in data], ignore_conflicts=True)
+    cases = CaseEntry.objects.all()
+    context = {
+        'cases': cases
+    }
+    return render(request, "app/index.html", context)
 
 def todo(request):
     if request.method == 'GET':
