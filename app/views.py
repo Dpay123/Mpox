@@ -1,8 +1,25 @@
 from django.shortcuts import render, redirect
 from django.db.models import Sum
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+import csv
 
 from .models import *
 from .forms import *
+from .modules import convert
+
+def update(request):
+    # get raw data conversion from .csv
+    data = convert()
+    # store into db
+    CaseEntry.objects.bulk_create([CaseEntry(**{
+        'country': d['country'],
+        'numCases': d['cases'],
+        'numDeaths': d['deaths'],
+        'endemic': d['endemic'],
+        'date': d['date']
+    }) for d in data], ignore_conflicts=True)
+    return HttpResponseRedirect(reverse('index'))
 
 def index(request):
     message = 'Select Filter'

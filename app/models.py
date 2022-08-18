@@ -21,7 +21,8 @@ class CaseEntry(models.Model):
     class Meta:
         unique_together = (('country', 'date'),)
 
-    country = models.CharField(max_length=50, primary_key=True)
+    id = models.IntegerField(primary_key = True)
+    country = models.CharField(max_length=50)
     numCases = models.IntegerField()
     numDeaths = models.IntegerField()
     endemic = models.BooleanField()
