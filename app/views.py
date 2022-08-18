@@ -1,17 +1,16 @@
-from sqlite3 import IntegrityError
-from tkinter.tix import INTEGER
 from django.shortcuts import render, redirect
 from django.db.models import Sum
-from datetime import datetime
 
-from . import convert
+from .models import *
 from .forms import *
 
 def index(request):
     message = 'Select Filter'
     if request.method == 'GET':
+        cases = CaseEntry.objects.all()
         context = {
             'message': message,
+            'cases': cases,
             'form': Filter()
         }
         return render(request, "app/index.html", context)
@@ -30,9 +29,9 @@ def index(request):
         context = {
             'message': message,
             'cases': cases,
-            'form': Filter(request.POST),
             'totalC': totalC['numCases__sum'],
-            'totalD': totalD['numDeaths__sum']
+            'totalD': totalD['numDeaths__sum'],
+            'form': Filter(request.POST)
         }
         return render(request, "app/index.html", context)
 
