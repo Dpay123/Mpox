@@ -8,6 +8,7 @@
     {{ form.date }}
     {{ form.country }}
     <input type="submit" value="Filter">
+    <a href="{% url 'update' %}">Update</a>
 </form>
 
 {% if cases %}
