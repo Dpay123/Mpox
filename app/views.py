@@ -28,7 +28,7 @@ def index(request):
         context = {
             'message': message,
             'cases': cases,
-            'form': Filter()
+            'form': Filter(initial= {'date': max(CaseEntry.objects.values_list('date'))})
         }
         return render(request, "app/index.html", context)
     else:

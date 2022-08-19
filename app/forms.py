@@ -1,3 +1,4 @@
+from email.policy import default
 from django import forms
 from django.forms import ModelForm
 
@@ -15,4 +16,4 @@ class TaskEntryForm(ModelForm):
 
 class Filter(forms.Form):
     date = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('date', flat=True).distinct(), required=True)
-    country = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('country', flat=True), required=False)
+    country = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('country', flat=True).distinct(), required=False)
