@@ -10,28 +10,37 @@
     <table>
         {{ form.as_table }}
         <tr>
+            <td></td>
             <td>
-                <b>Submit Task:</b>
-            </td>
-            <td>
-                <input type="submit" value="Task" class="submit">
+                <input type="submit" value="SUBMIT" class="submit">
             </td>
         </tr>
     </table>
 </form>
 
 <h4>Tasks</h4>
-<table>
-    <tr>
-        <th>Priority</th>
-        <th>Description</th>
-    </tr>
-{% for task in tasks %}
-    <tr>
-        <td>{{ task.priority }}</td>
-        <td>{{ task.desc }}</td>
-    </tr>
-{% endfor %}
+<table class="table table-striped table-bordered table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th>Priority</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.priority }}</td>
+            <td>{{ task.desc }}</td>
+            <td>
+                <form action="{% url 'removeTask' id=task.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove Task</button>
+                </form>      
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}
     
