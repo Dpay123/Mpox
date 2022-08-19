@@ -24,25 +24,50 @@
         <tr>
             <th>Priority</th>
             <th>Description</th>
-            <th></th>
+            <th>Status</th>
+            <th>Update</th>
         </tr>
     </thead>
     <tbody>
         {% for task in tasks %}
+
+        {% if task.completed == 0 %}
         <tr>
             <td>{{ task.priority }}</td>
             <td>{{ task.desc }}</td>
             <td>
-                <form action="{% url 'removeTask' id=task.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Remove Task</button>
-                </form>
-                <form action="{% url 'completeTask' id=task.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Mark Complete</button>
-                </form>       
+                <div>
+                    <form action="{% url 'completeTask' id=task.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Mark Complete</button>
+                    </form>
+                </div>
+            </td>
+            <td>
+                <div>
+                    <form action="{% url 'removeTask' id=task.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Remove Task</button>
+                    </form>
+                </div>       
             </td>
         </tr>
+        {% else %}
+        <tr class="table-success">
+            <th scope="row">{{ task.priority }}</th>
+            <th scope="row">{{ task.desc }}</th>
+            <th scope="row">COMPLETED</th>
+            <td>
+                <div>
+                    <form action="{% url 'removeTask' id=task.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Remove Task</button>
+                    </form>
+                </div>    
+            </td>
+        </tr>
+        {% endif %}
+
         {% endfor %}
     </tbody>
 </table>
