@@ -8,6 +8,10 @@ from .models import *
 from .forms import *
 from .modules import convert
 
+def removeTask(request, id):
+    Task.objects.filter(id=id).delete()
+    return HttpResponseRedirect(reverse('todo'))
+
 def update(request):
     # get raw data conversion from .csv
     data = convert()
