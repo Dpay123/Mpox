@@ -12,7 +12,7 @@ class LogEntryForm(ModelForm):
 class TaskEntryForm(ModelForm):
     class Meta:
         model = Task
-        exclude = []
+        exclude = ['completed', 'compDate']
 
 class Filter(forms.Form):
     date = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('date', flat=True).distinct(), required=True)

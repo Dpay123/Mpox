@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
@@ -10,6 +11,10 @@ from .modules import convert
 
 def removeTask(request, id):
     Task.objects.filter(id=id).delete()
+    return HttpResponseRedirect(reverse('todo'))
+
+def completeTask(request, id):
+    Task.objects.filter(id=id).update(completed=True, compDate=datetime.now())
     return HttpResponseRedirect(reverse('todo'))
 
 def update(request):
