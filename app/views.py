@@ -64,7 +64,7 @@ def index(request):
 
 def todo(request):
     if request.method == 'GET':
-        tasks = Task.objects.all().order_by('priority').values()
+        tasks = Task.objects.all().order_by('completed', 'priority').values()
         form = TaskEntryForm()
         context = {
             "tasks": tasks,
