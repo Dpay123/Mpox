@@ -9,35 +9,16 @@ from .models import *
 from .forms import *
 from .modules import convert
 
-def removeTask(request, id):
-    Task.objects.filter(id=id).delete()
-    return HttpResponseRedirect(reverse('todo'))
-
-def completeTask(request, id):
-    Task.objects.filter(id=id).update(completed=True, compDate=datetime.now())
-    return HttpResponseRedirect(reverse('todo'))
-
-def update(request):
-    # get raw data conversion from .csv
-    data = convert()
-    # store into db
-    CaseEntry.objects.bulk_create([CaseEntry(**{
-        'country': d['country'],
-        'numCases': d['cases'],
-        'numDeaths': d['deaths'],
-        'endemic': d['endemic'],
-        'date': d['date']
-    }) for d in data], ignore_conflicts=True)
-    return HttpResponseRedirect(reverse('index'))
-
 def index(request):
     message = 'Select Filter'
     if request.method == 'GET':
-        cases = CaseEntry.objects.all()
+        # present cases from the most recent date in db
+        latestDate = CaseEntry.objects.latest('date').date
+        cases = CaseEntry.objects.filter(date=latestDate)
         context = {
             'message': message,
             'cases': cases,
-            'form': Filter(initial= {'date': max(CaseEntry.objects.values_list('date'))})
+            'form': Filter(initial= {'date': latestDate})   # form default date is latest
         }
         return render(request, "app/index.html", context)
     else:
@@ -46,12 +27,13 @@ def index(request):
         countryInput = request.POST['country']
         if countryInput:
             cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
-            totalC = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numCases'))
-            totalD = CaseEntry.objects.filter(date=dateInput, country=countryInput).aggregate(Sum('numDeaths'))
+            totalC = cases.aggregate(Sum('numCases'))
+            totalD = cases.aggregate(Sum('numDeaths'))
         else:
+            # dateInput is mandatory, so if no countryInput, then defer to dateInput
             cases = CaseEntry.objects.filter(date=dateInput)
-            totalC = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numCases'))
-            totalD = CaseEntry.objects.filter(date=dateInput).aggregate(Sum('numDeaths'))
+            totalC = cases.aggregate(Sum('numCases'))
+            totalD = cases.aggregate(Sum('numDeaths'))
         context = {
             'message': message,
             'cases': cases,
@@ -61,6 +43,18 @@ def index(request):
         }
         return render(request, "app/index.html", context)
 
+def update(request):
+    # get raw data conversion from .csv
+    data = convert()
+    # store into db, ignoring if already in db
+    CaseEntry.objects.bulk_create([CaseEntry(**{
+        'country': d['country'],
+        'numCases': d['cases'],
+        'numDeaths': d['deaths'],
+        'endemic': d['endemic'],
+        'date': d['date']
+    }) for d in data], ignore_conflicts=True)
+    return HttpResponseRedirect(reverse('index'))
 
 def todo(request):
     if request.method == 'GET':
@@ -76,6 +70,14 @@ def todo(request):
         if form.is_valid():
             entry = form.save()
             return redirect('todo')
+
+def removeTask(request, id):
+    Task.objects.filter(id=id).delete()
+    return HttpResponseRedirect(reverse('todo'))
+
+def completeTask(request, id):
+    Task.objects.filter(id=id).update(completed=True, compDate=datetime.now())
+    return HttpResponseRedirect(reverse('todo'))
 
 def log(request):
     if request.method == 'GET':
