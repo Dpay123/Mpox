@@ -10,25 +10,29 @@
     <table>
         {{ form.as_table }}
         <td>
-            <input type="submit" value="Log">
+            <input type="submit" value="Submit Log">
         </td>
     </table>
 </form>
 
 <h4>Log History</h4>
-<table>
-    <tr>
-        <th>Version</th>
-        <th>Date</th>
-        <th>Description</th>
-    </tr>
-{% for log in logs %}
-    <tr>
-        <td>{{ log.version }}</td>
-        <td>{{ log.date }}</td>
-        <td>{{ log.desc }}</td>
-    </tr>
-{% endfor %}
+<table class="table table-striped table-bordered table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th>Version</th>
+            <th>Date</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td>{{ log.version }}</td>
+            <td>{{ log.date }}</td>
+            <td>{{ log.desc }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
 {% endblock %}
