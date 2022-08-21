@@ -15,5 +15,5 @@ class TaskEntryForm(ModelForm):
         exclude = ['completed', 'compDate', 'date']
 
 class Filter(forms.Form):
-    date = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('date', flat=True).distinct(), required=True)
-    country = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('country', flat=True).distinct(), required=False)
+    date = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('date', flat=True).distinct(), required=True, label='Date:')
+    country = forms.ModelChoiceField(queryset=CaseEntry.objects.values_list('country', flat=True).distinct(), required=False, label='Country:')

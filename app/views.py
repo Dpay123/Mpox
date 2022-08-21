@@ -15,33 +15,38 @@ def index(request):
         # present cases from the most recent date in db
         latestDate = CaseEntry.objects.latest('date').date
         cases = CaseEntry.objects.filter(date=latestDate)
+        totalC = cases.aggregate(Sum('numCases'))['numCases__sum']
+        totalD = cases.aggregate(Sum('numDeaths'))['numDeaths__sum']
         context = {
             'message': message,
             'cases': cases,
+            'totalC': totalC,
+            'totalD': totalD,
             'form': Filter(initial= {'date': latestDate})   # form default date is latest
         }
         return render(request, "app/index.html", context)
     else:
-        # dateInput variable stores format 'yyyy-mm-dd'
-        dateInput = request.POST['date']
-        countryInput = request.POST['country']
-        if countryInput:
-            cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
-            totalC = cases.aggregate(Sum('numCases'))
-            totalD = cases.aggregate(Sum('numDeaths'))
+        if 'filter' in request.POST:
+            # dateInput variable stores format 'yyyy-mm-dd'
+            dateInput = request.POST['date']
+            countryInput = request.POST['country']
+            if countryInput:
+                cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
+            else:
+                # dateInput is mandatory, so if no countryInput, then defer to dateInput
+                cases = CaseEntry.objects.filter(date=dateInput)
+            totalC = cases.aggregate(Sum('numCases'))['numCases__sum']
+            totalD = cases.aggregate(Sum('numDeaths'))['numDeaths__sum']
+            context = {
+                'message': message,
+                'cases': cases,
+                'totalC': totalC,
+                'totalD': totalD,
+                'form': Filter(request.POST)
+            }
+            return render(request, "app/index.html", context)
         else:
-            # dateInput is mandatory, so if no countryInput, then defer to dateInput
-            cases = CaseEntry.objects.filter(date=dateInput)
-            totalC = cases.aggregate(Sum('numCases'))
-            totalD = cases.aggregate(Sum('numDeaths'))
-        context = {
-            'message': message,
-            'cases': cases,
-            'totalC': totalC['numCases__sum'],
-            'totalD': totalD['numDeaths__sum'],
-            'form': Filter(request.POST)
-        }
-        return render(request, "app/index.html", context)
+            return redirect('index')
 
 def update(request):
     # get raw data conversion from .csv
@@ -53,8 +58,8 @@ def update(request):
         'numDeaths': d['deaths'],
         'endemic': d['endemic'],
         'date': d['date']
-    }) for d in data], ignore_conflicts=True)
-    return HttpResponseRedirect(reverse('index'))
+    }) for d in data], ignore_conflicts=True)   # error handling in case already uploaded data
+    return redirect('index')
 
 def todo(request):
     if request.method == 'GET':
@@ -73,11 +78,11 @@ def todo(request):
 
 def removeTask(request, id):
     Task.objects.filter(id=id).delete()
-    return HttpResponseRedirect(reverse('todo'))
+    return redirect('todo')
 
 def completeTask(request, id):
     Task.objects.filter(id=id).update(completed=True, compDate=datetime.now())
-    return HttpResponseRedirect(reverse('todo'))
+    return redirect('todo')
 
 def log(request):
     if request.method == 'GET':
