@@ -7,6 +7,7 @@
     {% csrf_token %}
     {{ form.date }}
     {{ form.country }}
+    {{ form.reportBy }}
     <input type="submit" value="Filter" name="filter">
     <input type="submit" value="Reset Filter" name="unfilter">
     <a href="{% url 'update' %}">Update Data</a>
