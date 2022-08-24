@@ -14,7 +14,7 @@ def index(request):
     if request.method == 'GET':
         # present cases from the most recent date in db
         latestDate = CaseEntry.objects.latest('date').date
-        cases = CaseEntry.objects.filter(date=latestDate)
+        cases = CaseEntry.objects.filter(date=latestDate).order_by('country').values()
         totalC = cases.aggregate(Sum('numCases'))['numCases__sum']
         totalD = cases.aggregate(Sum('numDeaths'))['numDeaths__sum']
         context = {
@@ -30,6 +30,7 @@ def index(request):
             # dateInput variable stores format 'yyyy-mm-dd'
             dateInput = request.POST['date']
             countryInput = request.POST['country']
+            reportBy = request.POST['reportBy']
             if countryInput:
                 cases = CaseEntry.objects.filter(date=dateInput, country=countryInput)
             else:
@@ -37,12 +38,17 @@ def index(request):
                 cases = CaseEntry.objects.filter(date=dateInput)
             totalC = cases.aggregate(Sum('numCases'))['numCases__sum']
             totalD = cases.aggregate(Sum('numDeaths'))['numDeaths__sum']
+            if not reportBy:
+                cases = cases.order_by('country').values()
+            else:
+                cases = cases.order_by(reportBy).values()
             context = {
                 'message': message,
                 'cases': cases,
                 'totalC': totalC,
                 'totalD': totalD,
-                'form': Filter(request.POST)
+                'form': Filter(request.POST),
+                'test': reportBy
             }
             return render(request, "app/index.html", context)
         else:
